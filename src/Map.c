@@ -4,6 +4,7 @@
 #include "Hash.h"
 #include "ComparePerson.h"
 #include "CException.h"
+#include "ErrorCode.h"
 #include <stdio.h>
 #include <malloc.h>
 
@@ -16,12 +17,16 @@ Map *mapNew(int length){
 }
 
 void mapStore(Map *map, void *element, int (*compare)(void *, void *), unsigned int (*hash)(void *)){
- int index;
- List *list = listNew(element, NULL);
+  int index;
+  List *list = listNew(element, NULL);
+  index = hash(element);
  
- index = hash(element);
- 
- map->bucket[index] = list;
+  if(map->bucket[index] != NULL){
+    if(compare(((List *)map->bucket[index])->data, element) == 1){
+      Throw(ERR_SAME_ELEMENT);
+    }
+  }
+  map->bucket[index] = list;
 }
               
 void *mapFind(Map *map,

@@ -36,21 +36,22 @@ void test_mapStore_given_Ali_should_add_it_to_map(){
   TEST_ASSERT_EQUAL_Person(person, getPersonFromBucket(map->bucket[3]));
 }
 
-// void Xtest_mapStore_given_Ali_but_Ali_is_in_the_Map_should_throw_ERR_SAME_ELEMENT_exception(){
-  // CEXCEPTION_T e;
-  // Person *person = personNew("Ali", 25, 70.3);
-  // Map *map = mapNew(5);
+void test_mapStore_given_Ali_but_Ali_is_in_the_Map_should_throw_ERR_SAME_ELEMENT_exception(){
+  CEXCEPTION_T e;
+  Person *person = personNew("Ali", 25, 70.3);
+  Map *map = mapNew(5);
+  List *list = listNew(person, NULL);
   
-  // map->bucket[3] = person;
-  // hash_ExpectAndReturn(person, 3);
-  // comparePerson_ExpectAndReturn(person, person, 1);
+  map->bucket[3] = list;
+  hash_ExpectAndReturn(person, 3);
+  comparePerson_ExpectAndReturn(person, person, 1);
   
-  // Try{
-    // mapStore(map, person, comparePerson, hash);
-    // TEST_FAIL_MESSAGE("Expect ERR_SAME_ELEMENT exception to be thrown");
-  // }Catch(e){
-    // TEST_ASSERT_EQUAL(ERR_SAME_ELEMENT, e);
-    // TEST_ASSERT_NOT_NULL(map->bucket[3]);
-    // TEST_ASSERT_EQUAL_STRING("Ali", ((Person *)((List *)map->bucket[3])->data)->name);
-  // }
-// }
+  Try{
+    mapStore(map, person, comparePerson, hash);
+    TEST_FAIL_MESSAGE("Expect ERR_SAME_ELEMENT exception to be thrown");
+  }Catch(e){
+    TEST_ASSERT_EQUAL(ERR_SAME_ELEMENT, e);
+    TEST_ASSERT_NOT_NULL(map->bucket[3]);
+    TEST_ASSERT_EQUAL_Person(person, getPersonFromBucket(map->bucket[3]));
+  }
+}
