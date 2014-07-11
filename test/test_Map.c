@@ -31,7 +31,7 @@ void test_mapStore_given_Ali_should_add_it_to_map(){
   mapStore(map, person, comparePerson, hash);
   
   TEST_ASSERT_NOT_NULL(map->bucket[3]);
-  TEST_ASSERT_EQUAL_Person(person, getPersonFromBucket(map->bucket[3]));
+  TEST_ASSERT_EQUAL_Person("Ali", 25, 70.3, getPersonFromBucket(map->bucket[3]));
 }
 
 void test_mapStore_given_Ali_but_Ali_is_in_the_Map_should_throw_ERR_SAME_ELEMENT_exception(){
@@ -50,7 +50,7 @@ void test_mapStore_given_Ali_but_Ali_is_in_the_Map_should_throw_ERR_SAME_ELEMENT
   }Catch(e){
     TEST_ASSERT_EQUAL(ERR_SAME_ELEMENT, e);
     TEST_ASSERT_NOT_NULL(map->bucket[3]);
-    TEST_ASSERT_EQUAL_Person(person, getPersonFromBucket(map->bucket[3]));
+    TEST_ASSERT_EQUAL_Person("Ali", 25, 70.3, getPersonFromBucket(map->bucket[3]));
   }
 }
 
@@ -68,8 +68,8 @@ void test_mapStore_given_Ali_Zorro_both_has_same_hash_value(){
   mapStore(map, personZorro, comparePerson, hash);
 
 	TEST_ASSERT_NOT_NULL(map->bucket[3]);
-	TEST_ASSERT_EQUAL_Person(personZorro, getPersonFromBucket(map->bucket[3]));
-	TEST_ASSERT_EQUAL_Person(personAli, getPersonFromBucket(((List *)map->bucket[3])->next));
+	TEST_ASSERT_EQUAL_Person("Zorro", 35, 65.5, getPersonFromBucket(map->bucket[3]));
+	TEST_ASSERT_EQUAL_Person("Ali", 25, 70.3, getPersonFromBucket(((List *)map->bucket[3])->next));
 
 }
 
@@ -86,6 +86,6 @@ void test_mapStore_given_Ali_Dave_should_add_it_to_map(){
   
   TEST_ASSERT_NOT_NULL(map->bucket[3]);
   TEST_ASSERT_NOT_NULL(map->bucket[4]);
-  TEST_ASSERT_EQUAL_Person(person, getPersonFromBucket(map->bucket[3]));
-  TEST_ASSERT_EQUAL_Person(person2, getPersonFromBucket(map->bucket[4]));
+  TEST_ASSERT_EQUAL_Person("Ali", 25, 70.3, getPersonFromBucket(map->bucket[3]));
+  TEST_ASSERT_EQUAL_Person("Dave", 33, 62.2, getPersonFromBucket(map->bucket[4]));
 }

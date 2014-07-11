@@ -54,3 +54,28 @@ void *mapFind(Map *map, void *element, int (*compare)(void *, void *), unsigned 
   }
 	return returnPerson;
 }
+
+void *mapRemove(Map *map, void *element, int (*compare)(void *, void *), unsigned int (*hash)(void *)){
+  Person *removePerson = NULL;
+  List *prevList, *currentList;
+  int index;
+  
+  index = hash(element);
+  currentList = ((List *)map->bucket[index]);
+  
+  if(map->bucket[index] != NULL){
+    while(currentList != NULL){
+      if(compare(currentList->data, element) == 1){
+        removePerson = (Person *)(currentList->data);
+        if(((List *)map->bucket[index])->next == NULL)
+          map->bucket[index] = currentList->next;
+        else
+          prevList->next = currentList->next;
+      }
+      prevList = currentList;
+      currentList = currentList->next;
+    }  
+  }
+  
+	return removePerson;
+}
