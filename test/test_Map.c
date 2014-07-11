@@ -27,12 +27,10 @@ void test_mapStore_given_Ali_should_add_it_to_map(){
   Map *map = mapNew(5);
   
   hash_ExpectAndReturn(person, 3);
-  // comparePerson_ExpectAndReturn();
   
   mapStore(map, person, comparePerson, hash);
   
   TEST_ASSERT_NOT_NULL(map->bucket[3]);
-  // TEST_ASSERT_EQUAL_STRING("Ali", ((Person *)((List *)map->bucket[3])->data)->name);
   TEST_ASSERT_EQUAL_Person(person, getPersonFromBucket(map->bucket[3]));
 }
 
@@ -56,6 +54,25 @@ void test_mapStore_given_Ali_but_Ali_is_in_the_Map_should_throw_ERR_SAME_ELEMENT
   }
 }
 
+void test_mapStore_given_Ali_Zorro_both_has_same_hash_value(){
+  CEXCEPTION_T e;
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personZorro = personNew("Zorro", 35, 65.5);
+  Map *map = mapNew(5);
+  List *list = listNew(personAli, NULL);
+  
+  map->bucket[3] = list;
+  hash_ExpectAndReturn(personZorro, 3);
+  comparePerson_ExpectAndReturn(personAli, personZorro, 0);
+  
+  mapStore(map, personZorro, comparePerson, hash);
+
+	TEST_ASSERT_NOT_NULL(map->bucket[3]);
+	TEST_ASSERT_EQUAL_Person(personZorro, getPersonFromBucket(map->bucket[3]));
+	TEST_ASSERT_EQUAL_Person(personAli, getPersonFromBucket(((List *)map->bucket[3])->next));
+
+}
+
 void test_mapStore_given_Ali_Dave_should_add_it_to_map(){
   Person *person = personNew("Ali", 25, 70.3);
   Person *person2 = personNew("Dave", 33, 62.2);
@@ -63,14 +80,12 @@ void test_mapStore_given_Ali_Dave_should_add_it_to_map(){
   
   hash_ExpectAndReturn(person, 3);
   hash_ExpectAndReturn(person2, 4);
-  // comparePerson_ExpectAndReturn();
   
   mapStore(map, person, comparePerson, hash);
   mapStore(map, person2, comparePerson, hash);
   
   TEST_ASSERT_NOT_NULL(map->bucket[3]);
   TEST_ASSERT_NOT_NULL(map->bucket[4]);
-  // TEST_ASSERT_EQUAL_STRING("Ali", ((Person *)((List *)map->bucket[3])->data)->name);
   TEST_ASSERT_EQUAL_Person(person, getPersonFromBucket(map->bucket[3]));
   TEST_ASSERT_EQUAL_Person(person2, getPersonFromBucket(map->bucket[4]));
 }

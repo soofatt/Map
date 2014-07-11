@@ -18,15 +18,22 @@ Map *mapNew(int length){
 
 void mapStore(Map *map, void *element, int (*compare)(void *, void *), unsigned int (*hash)(void *)){
   int index;
-  List *list = listNew(element, NULL);
+  
   index = hash(element);
  
   if(map->bucket[index] != NULL){
     if(compare(((List *)map->bucket[index])->data, element) == 1){
       Throw(ERR_SAME_ELEMENT);
     }
+		else{
+			List *list = listNew(element, (List *)map->bucket[index]);
+			map->bucket[index] = list;
+		}
   }
-  map->bucket[index] = list;
+	else{
+		List *list = listNew(element, NULL);
+		map->bucket[index] = list;
+	}
 }
               
 void *mapFind(Map *map,
