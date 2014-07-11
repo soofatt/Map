@@ -36,9 +36,21 @@ void mapStore(Map *map, void *element, int (*compare)(void *, void *), unsigned 
 	}
 }
               
-void *mapFind(Map *map,
-              void *element, 
-              int (*compare)(void *, void *),
-              unsigned int (*hash)(void *)){
-  return NULL;
+void *mapFind(Map *map, void *element, int (*compare)(void *, void *), unsigned int (*hash)(void *)){
+  Person *returnPerson = NULL;
+  List *nextList;
+  int index;
+  
+  index = hash(element);
+  nextList = ((List *)map->bucket[index]);
+  
+  if(map->bucket[index] != NULL){
+    while(nextList != NULL){
+      if(compare(nextList->data, element) == 1){
+        returnPerson = (Person *)(nextList->data);
+      }
+      nextList = nextList->next;
+    }  
+  }
+	return returnPerson;
 }

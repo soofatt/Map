@@ -4,7 +4,7 @@
 #include "List.h"
 #include "CustomAssert.h"
 #include "mock_Hash.h"
-#include "mock_ComparePerson.h"
+#include "ComparePerson.h"
 #include "CException.h"
 #include "ErrorCode.h"
 
@@ -42,7 +42,6 @@ void test_mapStore_given_Ali_but_Ali_is_in_the_Map_should_throw_ERR_SAME_ELEMENT
   
   map->bucket[3] = list;
   hash_ExpectAndReturn(person, 3);
-  comparePerson_ExpectAndReturn(person, person, 1);
   
   Try{
     mapStore(map, person, comparePerson, hash);
@@ -63,7 +62,6 @@ void test_mapStore_given_Ali_Zorro_both_has_same_hash_value(){
   
   map->bucket[3] = list;
   hash_ExpectAndReturn(personZorro, 3);
-  comparePerson_ExpectAndReturn(personAli, personZorro, 0);
   
   mapStore(map, personZorro, comparePerson, hash);
 
@@ -88,4 +86,68 @@ void test_mapStore_given_Ali_Dave_should_add_it_to_map(){
   TEST_ASSERT_NOT_NULL(map->bucket[4]);
   TEST_ASSERT_EQUAL_Person(person, getPersonFromBucket(map->bucket[3]));
   TEST_ASSERT_EQUAL_Person(person2, getPersonFromBucket(map->bucket[4]));
+}
+
+void test_mapFind_given_Ali_and_Ali_is_in_the_map(){
+	Person *personAli = personNew("Ali", 0, 0);
+	Person *personToFind = personNew("Ali", 0, 0);
+  Person *result;
+	Map *map = mapNew(5);
+  List *list = listNew(personAli, NULL);
+	map->bucket[3] = list;
+	
+	hash_ExpectAndReturn(personToFind, 3);
+  
+  result = mapFind(map, personToFind, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(personAli, result);
+}
+
+void test_mapFind_given_Ali_but_Ali_is_not_in_map_should_return_NULL(){
+	Person *personToFind = personNew("Ali", 0, 0);
+  Person *result;
+	Map *map = mapNew(5);
+	map->bucket[3] = NULL;
+	
+	hash_ExpectAndReturn(personToFind, 3);
+  
+  result = mapFind(map, personToFind, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(NULL, result);
+}
+
+void test_mapFind_given_Ali_and_Ali_is_in_the_linked_list(){
+	Person *personAli = personNew("Ali", 0, 0);
+	Person *personJames = personNew("James", 0, 0);
+	Person *personZorro = personNew("Zorro", 0, 0);
+	Person *personToFind = personNew("Ali", 0, 0);
+  Person *result;
+	Map *map = mapNew(5);
+  List *list = listNew(personAli, NULL);
+  list = listNew(personJames, list);
+  list = listNew(personZorro, list);
+	map->bucket[3] = list;
+	
+	hash_ExpectAndReturn(personToFind, 3);
+  
+  result = mapFind(map, personToFind, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(personAli, result);
+}
+
+void test_mapFind_given_Ali_and_Ali_is_NOT_in_the_linked_list_given_James_Zorro(){
+	Person *personJames = personNew("James", 0, 0);
+	Person *personZorro = personNew("Zorro", 0, 0);
+	Person *personToFind = personNew("Ali", 0, 0);
+  Person *result;
+	Map *map = mapNew(5);
+  List *list = listNew(personZorro, NULL);
+  list = listNew(personJames, list);
+	map->bucket[3] = list;
+	
+	hash_ExpectAndReturn(personToFind, 3);
+  
+  result = mapFind(map, personToFind, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(NULL, result);
 }
