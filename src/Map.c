@@ -79,3 +79,33 @@ void *mapRemove(Map *map, void *element, int (*compare)(void *, void *), unsigne
   
 	return removePerson;
 }
+
+void mapLinearStore(Map *map, void *element, int (*compare)(void *, void *), unsigned int (*hash)(void *)){
+  int index;
+  
+  index = hash(element);
+  void *currentBucket = map->bucket[index];
+  
+  if(isBucketEmpty(currentBucket)){
+    map->bucket[index] = element;
+  }
+  else{
+    while(index <= map->length){
+      if(map->bucket[index] != NULL){
+        if(compare(map->bucket[index], element) == 1)
+          Throw(ERR_SAME_ELEMENT);
+        else
+          index++;
+      }
+      
+      else{
+        map->bucket[index] = element;
+        return;
+      }
+    }
+  }
+}
+
+
+
+

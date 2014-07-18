@@ -247,3 +247,70 @@ void test_mapRemove_given_Ali_and_Ali_is_the_middle_of_the_linked_list(){
   
   // listDump(list, personDump);
 }
+
+void test_mapLinearStore_given_Ali_should_add_it_to_map_location_3(){
+  Person *person = personNew("Ali", 25, 70.3);
+  Map *map = mapNew(5);
+  
+  hash_ExpectAndReturn(person, 3);
+  
+  mapLinearStore(map, person, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(person, map->bucket[3]);
+  TEST_ASSERT_EQUAL_STRING("Ali", ((Person *)map->bucket[3])->name);
+}
+
+void test_mapLinearStore_given_Ali_in_3_should_add_Ana_to_map_location_4(){
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personAna = personNew("Ana", 19, 44.6);
+  Map *map = mapNew(5);
+  
+  hash_ExpectAndReturn(personAli, 3);
+  hash_ExpectAndReturn(personAna, 3);
+  
+  mapLinearStore(map, personAli, comparePerson, hash);
+  mapLinearStore(map, personAna, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(personAli, map->bucket[3]);
+  TEST_ASSERT_EQUAL_PTR(personAna, map->bucket[4]);
+  TEST_ASSERT_EQUAL_STRING("Ana", ((Person *)map->bucket[4])->name);
+}
+
+void test_mapLinearStore_given_Ali_Ana_in_3_4_should_add_Zoro_to_map_location_5(){
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personAna = personNew("Ana", 19, 44.6);
+  Person *personZoro = personNew("Zoro", 20, 75.4);
+  Map *map = mapNew(5);
+  
+  hash_ExpectAndReturn(personAli, 2);
+  hash_ExpectAndReturn(personAna, 2);
+  hash_ExpectAndReturn(personZoro, 2);
+  
+  mapLinearStore(map, personAli, comparePerson, hash);
+  mapLinearStore(map, personAna, comparePerson, hash);
+  mapLinearStore(map, personZoro, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(personAli, map->bucket[2]);
+  TEST_ASSERT_EQUAL_PTR(personAna, map->bucket[3]);
+  TEST_ASSERT_EQUAL_PTR(personZoro, map->bucket[4]);
+  TEST_ASSERT_EQUAL_STRING("Zoro", ((Person *)map->bucket[4])->name);
+}
+
+void test_mapLinearStore_given_Ali_in_3_and_Ali_again_should_throw_error(){
+  CEXCEPTION_T e;
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personAli2 = personNew("Ali", 25, 70.3);
+  Map *map = mapNew(5);
+  
+  hash_ExpectAndReturn(personAli, 3);
+  hash_ExpectAndReturn(personAli2, 3);
+  mapLinearStore(map, personAli, comparePerson, hash);
+  
+  Try{
+    mapLinearStore(map, personAli2, comparePerson, hash);
+    TEST_FAIL_MESSAGE("Expect ERR_SAME_ELEMENT exception to be thrown");
+  }Catch(e){
+    TEST_ASSERT_EQUAL(ERR_SAME_ELEMENT, e);
+    TEST_ASSERT_NOT_NULL(map->bucket[3]);
+  }
+}
