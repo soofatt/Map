@@ -16,6 +16,14 @@ Map *mapNew(int length){
   return map;
 }
 
+/*Function to store an element in the map(Separate chaining method)
+ *
+ *Input : *map : The map
+ *        *element : The element to be stored
+ *        (*compare)(void *, void *) : Compare function
+ *        (*hash)(void *) : Hash function
+ *
+ */
 void mapStore(Map *map, void *element, int (*compare)(void *, void *), unsigned int (*hash)(void *)){
   int index;
   
@@ -35,7 +43,17 @@ void mapStore(Map *map, void *element, int (*compare)(void *, void *), unsigned 
 		map->bucket[index] = list;
 	}
 }
-              
+
+/*Function to find an element in the map(Separate chaining method)
+ *
+ *Input : *map : The map
+ *        *element : The element to be found
+ *        (*compare)(void *, void *) : Compare function
+ *        (*hash)(void *) : Hash function
+ *
+ *Output : returnPerson : The found element
+ *
+ */              
 void *mapFind(Map *map, void *element, int (*compare)(void *, void *), unsigned int (*hash)(void *)){
   Person *returnPerson = NULL;
   List *nextList;
@@ -55,6 +73,16 @@ void *mapFind(Map *map, void *element, int (*compare)(void *, void *), unsigned 
 	return returnPerson;
 }
 
+/*Function to remove an element in the map(Separate chaining method)
+ *
+ *Input : *map : The map
+ *        *element : The element to be found
+ *        (*compare)(void *, void *) : Compare function
+ *        (*hash)(void *) : Hash function
+ *
+ *Output : removePerson : The removed element
+ *
+ */
 void *mapRemove(Map *map, void *element, int (*compare)(void *, void *), unsigned int (*hash)(void *)){
   Person *removePerson = NULL;
   List *prevList, *currentList;
@@ -80,6 +108,14 @@ void *mapRemove(Map *map, void *element, int (*compare)(void *, void *), unsigne
 	return removePerson;
 }
 
+/*Function to store an element in the map(Linear probing method)
+ *
+ *Input : *map : The map
+ *        *element : The element to be stored
+ *        (*compare)(void *, void *) : Compare function
+ *        (*hash)(void *) : Hash function
+ *
+ */
 void mapLinearStore(Map *map, void *element, int (*compare)(void *, void *), unsigned int (*hash)(void *)){
   int index;
   
@@ -107,6 +143,16 @@ void mapLinearStore(Map *map, void *element, int (*compare)(void *, void *), uns
       Throw(ERR_OUT_OF_BOUNDS);
 }
 
+/*Function to find an element in the map(Linear probing method)
+ *
+ *Input : *map : The map
+ *        *element : The element to be found
+ *        (*compare)(void *, void *) : Compare function
+ *        (*hash)(void *) : Hash function
+ *
+ *Output : personFound : The found element
+ *
+ */
 void *mapLinearFind(Map *map, void *element, int (*compare)(void *, void *), unsigned int (*hash)(void *)){
   int index;
   Person *personFound = NULL;
@@ -132,6 +178,16 @@ void *mapLinearFind(Map *map, void *element, int (*compare)(void *, void *), uns
   return personFound;
 }  
 
+/*Function to remove an element in the map(Linear probing method)
+ *
+ *Input : *map : The map
+ *        *element : The element to be removed
+ *        (*compare)(void *, void *) : Compare function
+ *        (*hash)(void *) : Hash function
+ *
+ *Output : personReturn : The removed element
+ *
+ */
 void *mapLinearRemove(Map *map, void *element, int (*compare)(void *, void *), unsigned int (*hash)(void *)){
   int index;
   Person *personReturn = NULL;
@@ -144,7 +200,14 @@ void *mapLinearRemove(Map *map, void *element, int (*compare)(void *, void *), u
     else{
       if(compare(map->bucket[index], element) == 1){
         personReturn = (Person *)map->bucket[index];
-        map->bucket[index] = (void *)-1;
+        if(map->bucket[index+1] == NULL){
+          map->bucket[index] = NULL;
+          while(isBucketMarked(map->bucket[--index])){
+            map->bucket[index] = NULL;
+          }
+        }
+        else
+          map->bucket[index] = (void *)-1;
         break;
       }
       else

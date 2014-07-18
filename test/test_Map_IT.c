@@ -513,7 +513,7 @@ void test_mapLinearRemove_given_marked_NULL_finding_Ali_but_Ali_is_not_in_map_sh
   TEST_ASSERT_EQUAL_PTR(NULL, result);
 }
 
-void test_mapLinearRemove_given_Ali_Ali_is_in_map_location_3_should_return_Ali_and_mark_loc_3(){
+void test_mapLinearRemove_given_Ali_Ali_is_in_map_location_3_should_return_Ali_and_NULL_loc_3(){
   Person *personAli = personNew("Ali", 25, 70.3);
   Person *personToRemove = personNew("Ali", 0, 0);
   Person *result;
@@ -525,10 +525,10 @@ void test_mapLinearRemove_given_Ali_Ali_is_in_map_location_3_should_return_Ali_a
   result = mapLinearRemove(map, personToRemove, comparePerson, hash);
   
   TEST_ASSERT_EQUAL_PTR(personAli, result);
-  TEST_ASSERT_EQUAL_PTR(-1, map->bucket[3]);
+  TEST_ASSERT_EQUAL_PTR(NULL, map->bucket[3]);
 }
 
-void test_mapLinearRemove_given_Zoro_Ali_Ali_is_in_map_location_3_should_return_Ali_and_mark_loc_3(){
+void test_mapLinearRemove_given_Zoro_Ali_Ali_is_in_map_location_3_should_return_Ali_and_NULL_loc_3(){
   Person *personZoro = personNew("Zoro", 20, 75.4);
   Person *personAli = personNew("Ali", 25, 70.3);
   Person *personToRemove = personNew("Ali", 0, 0);
@@ -542,31 +542,27 @@ void test_mapLinearRemove_given_Zoro_Ali_Ali_is_in_map_location_3_should_return_
   result = mapLinearRemove(map, personToRemove, comparePerson, hash);
   
   TEST_ASSERT_EQUAL_PTR(personAli, result);
-  TEST_ASSERT_EQUAL_PTR(-1, map->bucket[3]);
+  TEST_ASSERT_EQUAL_PTR(NULL, map->bucket[3]);
 }
 
-void test_mapLinearRemove_given_Zoro_Ana_Ali_Ali_is_in_map_location_3_should_return_Ali_and_mark_loc_3(){
+void test_mapLinearRemove_given_Zoro_Ali_Zoro_is_in_map_location_2_should_return_Zoro_and_mark_loc_2(){
   Person *personZoro = personNew("Zoro", 20, 75.4);
-  Person *personAna = personNew("Ana", 19, 44.6);
   Person *personAli = personNew("Ali", 25, 70.3);
-  Person *personToRemove = personNew("Ali", 0, 0);
+  Person *personToRemove = personNew("Zoro", 0, 0);
   Person *result;
   Map *map = mapNew(5);
   map->bucket[2] = personZoro;
   map->bucket[3] = personAli;
-  map->bucket[4] = personAna;
   
   hash_ExpectAndReturn(personToRemove, 2);
   
   result = mapLinearRemove(map, personToRemove, comparePerson, hash);
   
-  TEST_ASSERT_EQUAL_PTR(personAli, result);
-  TEST_ASSERT_EQUAL_PTR(-1, map->bucket[3]);
-  TEST_ASSERT_EQUAL_PTR(personZoro, map->bucket[2]);
-  TEST_ASSERT_EQUAL_PTR(personAna, map->bucket[4]);
+  TEST_ASSERT_EQUAL_PTR(personZoro, result);
+  TEST_ASSERT_EQUAL_PTR(-1, map->bucket[2]);
 }
 
-void test_mapLinearRemove_given_marked_Ali_Ali_is_in_map_location_3_should_return_Ali_and_mark_loc_3(){
+void test_mapLinearRemove_given_marked_Ali_Ali_is_in_map_location_3_should_return_Ali_and_NULL_loc_3(){
   Person *personAli = personNew("Ali", 25, 70.3);
   Person *personToRemove = personNew("Ali", 0, 0);
   Person *result;
@@ -579,10 +575,29 @@ void test_mapLinearRemove_given_marked_Ali_Ali_is_in_map_location_3_should_retur
   result = mapLinearRemove(map, personToRemove, comparePerson, hash);
   
   TEST_ASSERT_EQUAL_PTR(personAli, result);
-  TEST_ASSERT_EQUAL_PTR(-1, map->bucket[3]);
+  TEST_ASSERT_EQUAL_PTR(NULL, map->bucket[3]);
 }
 
-void test_mapLinearRemove_given_Ana_marked_Ali_Ali_is_in_map_location_3_should_return_Ali_and_mark_loc_3(){
+void test_mapLinearRemove_given_marked_marked_Ali_Ali_is_in_map_location_3_should_return_Ali_and_NULL_loc_1_2_3(){
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personToRemove = personNew("Ali", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  map->bucket[1] = (void *)-1;
+  map->bucket[2] = (void *)-1;
+  map->bucket[3] = personAli;
+  
+  hash_ExpectAndReturn(personToRemove, 1);
+  
+  result = mapLinearRemove(map, personToRemove, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(personAli, result);
+  TEST_ASSERT_EQUAL_PTR(NULL, map->bucket[1]);
+  TEST_ASSERT_EQUAL_PTR(NULL, map->bucket[2]);
+  TEST_ASSERT_EQUAL_PTR(NULL, map->bucket[3]);
+}
+
+void test_mapLinearRemove_given_Ana_marked_Ali_Ali_is_in_map_location_4_should_return_Ali_and_NULL_loc_3_4(){
   Person *personAna = personNew("Ana", 19, 44.6);
   Person *personAli = personNew("Ali", 25, 70.3);
   Person *personToRemove = personNew("Ali", 0, 0);
@@ -597,7 +612,28 @@ void test_mapLinearRemove_given_Ana_marked_Ali_Ali_is_in_map_location_3_should_r
   result = mapLinearRemove(map, personToRemove, comparePerson, hash);
   
   TEST_ASSERT_EQUAL_PTR(personAli, result);
-  TEST_ASSERT_EQUAL_PTR(-1, map->bucket[4]);
+  TEST_ASSERT_EQUAL_PTR(personAna, map->bucket[2]);
+  TEST_ASSERT_EQUAL_PTR(NULL, map->bucket[3]);
+  TEST_ASSERT_EQUAL_PTR(NULL, map->bucket[4]);
+}
+
+void test_mapLinearRemove_given_Ana_Zoro_Ali_Zoro_is_in_map_location_3_should_return_Zoro_and_mark_loc_3(){
+  Person *personAna = personNew("Ana", 19, 44.6);
+  Person *personZoro = personNew("Zoro", 20, 75.4);
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personToRemove = personNew("Zoro", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  map->bucket[2] = personAna;
+  map->bucket[3] = personZoro;
+  map->bucket[4] = personAli;
+  
+  hash_ExpectAndReturn(personToRemove, 2);
+  
+  result = mapLinearRemove(map, personToRemove, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(personZoro, result);
+  TEST_ASSERT_EQUAL_PTR(personAli, map->bucket[4]);
   TEST_ASSERT_EQUAL_PTR(-1, map->bucket[3]);
 }
 
