@@ -84,13 +84,12 @@ void mapLinearStore(Map *map, void *element, int (*compare)(void *, void *), uns
   int index;
   
   index = hash(element);
-  void *currentBucket = map->bucket[index];
   
-  if(isBucketEmpty(currentBucket)){
+  if(isBucketEmpty(map->bucket[index])){
     map->bucket[index] = element;
   }
   else{
-    while(index <= map->length){
+    while(index < map->length){
       if(map->bucket[index] != NULL){
         if(compare(map->bucket[index], element) == 1)
           Throw(ERR_SAME_ELEMENT);
@@ -104,8 +103,57 @@ void mapLinearStore(Map *map, void *element, int (*compare)(void *, void *), uns
       }
     }
   }
+  if(index >= map->length)
+      Throw(ERR_OUT_OF_BOUNDS);
 }
 
+void *mapLinearFind(Map *map, void *element, int (*compare)(void *, void *), unsigned int (*hash)(void *)){
+  int index;
+  Person *personFound = NULL;
+  
+  index = hash(element);
 
+  while(map->bucket[index] != NULL && index < map->length){
+    if(isBucketMarked(map->bucket[index]))
+      index++;
+    else{
+      if(compare(map->bucket[index], element) == 1){
+        personFound = (Person *)map->bucket[index];
+        break;
+      }
+      else
+        index++;
+    }
+  }
+  
+  if(index >= map->length)
+      Throw(ERR_OUT_OF_BOUNDS);
+  
+  return personFound;
+}  
 
-
+void *mapLinearRemove(Map *map, void *element, int (*compare)(void *, void *), unsigned int (*hash)(void *)){
+  int index;
+  Person *personReturn = NULL;
+  
+  index = hash(element);
+  
+  while(map->bucket[index] != NULL && index < map->length){
+    if(isBucketMarked(map->bucket[index]))
+      index++;
+    else{
+      if(compare(map->bucket[index], element) == 1){
+        personReturn = (Person *)map->bucket[index];
+        map->bucket[index] = (void *)-1;
+        break;
+      }
+      else
+        index++;
+    }
+  }
+  
+  if(index >= map->length)
+      Throw(ERR_OUT_OF_BOUNDS);
+  
+  return personReturn;
+}  

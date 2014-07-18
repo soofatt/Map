@@ -276,7 +276,7 @@ void test_mapLinearStore_given_Ali_in_3_should_add_Ana_to_map_location_4(){
   TEST_ASSERT_EQUAL_STRING("Ana", ((Person *)map->bucket[4])->name);
 }
 
-void test_mapLinearStore_given_Ali_Ana_in_3_4_should_add_Zoro_to_map_location_5(){
+void test_mapLinearStore_given_Ali_Ana_in_3_4_should_add_Zoro_to_map_location_4(){
   Person *personAli = personNew("Ali", 25, 70.3);
   Person *personAna = personNew("Ana", 19, 44.6);
   Person *personZoro = personNew("Zoro", 20, 75.4);
@@ -312,5 +312,310 @@ void test_mapLinearStore_given_Ali_in_3_and_Ali_again_should_throw_error(){
   }Catch(e){
     TEST_ASSERT_EQUAL(ERR_SAME_ELEMENT, e);
     TEST_ASSERT_NOT_NULL(map->bucket[3]);
+  }
+}
+
+void test_mapLinearStore_given_Ali_should_store_in_location_3_when_3_is_marked(){
+  CEXCEPTION_T e;
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Map *map = mapNew(5);
+  map->bucket[3] = (void *)-1;
+  
+  hash_ExpectAndReturn(personAli, 3);
+  
+  mapLinearStore(map, personAli, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(personAli, map->bucket[3]);
+}
+
+void test_mapLinearStore_given_Ali_hash_out_of_bounds_should_throw_error(){
+  CEXCEPTION_T e;
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personAna = personNew("Ana", 19, 44.6);
+  Map *map = mapNew(5);
+  
+  hash_ExpectAndReturn(personAli, 4);
+  hash_ExpectAndReturn(personAna, 5);
+  mapLinearStore(map, personAli, comparePerson, hash);
+  
+  Try{
+    mapLinearStore(map, personAna, comparePerson, hash);
+    TEST_FAIL_MESSAGE("Expect ERR_OUT_OF_BOUNDS exception to be thrown");
+  }Catch(e){
+    TEST_ASSERT_EQUAL(ERR_OUT_OF_BOUNDS, e);
+  }
+}
+
+void test_mapLinearFind_given_Ali_but_Ali_is_not_in_map_should_return_NULL(){
+  Person *personToFind = personNew("Ali", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  
+  hash_ExpectAndReturn(personToFind, 3);
+  
+  result = mapLinearFind(map, personToFind, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(NULL, result);
+}
+
+void test_mapLinearFind_given_marked_finding_Ali_but_Ali_is_not_in_map_should_return_NULL(){
+  Person *personToFind = personNew("Ali", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  map->bucket[3] = (void *)-1;
+  map->bucket[4] = NULL;
+  
+  hash_ExpectAndReturn(personToFind, 3);
+  
+  result = mapLinearFind(map, personToFind, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(NULL, result);
+}
+
+void test_mapLinearFind_given_Ali_Ali_is_in_map_location_3_should_return_Ali(){
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personToFind = personNew("Ali", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  map->bucket[3] = personAli;
+  
+  hash_ExpectAndReturn(personToFind, 3);
+  
+  result = mapLinearFind(map, personToFind, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(personAli, result);
+}
+
+void test_mapLinearFind_given_Ali_Zoro_and_Zoro_is_in_map_location_4_should_return_Zoro(){
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personZoro = personNew("Zoro", 20, 75.4);
+  Person *personToFind = personNew("Zoro", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  map->bucket[3] = personAli;
+  map->bucket[4] = personZoro;
+  
+  hash_ExpectAndReturn(personToFind, 3);
+  
+  result = mapLinearFind(map, personToFind, comparePerson, hash);
+
+  TEST_ASSERT_EQUAL_PTR(personZoro, result);
+}
+
+void test_mapLinearFind_given_Ali_Zoro_Ana_and_Zoro_is_in_map_location_4_should_return_Ana(){
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personZoro = personNew("Zoro", 20, 75.4);
+  Person *personAna = personNew("Ana", 19, 44.6);
+  Person *personToFind = personNew("Ana", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  map->bucket[2] = personAli;
+  map->bucket[3] = personZoro;
+  map->bucket[4] = personAna;
+  
+  hash_ExpectAndReturn(personToFind, 2);
+  
+  result = mapLinearFind(map, personToFind, comparePerson, hash);
+
+  TEST_ASSERT_EQUAL_PTR(personAna, result);
+}
+
+void test_mapLinearFind_given_marked_Zoro_Zoro_is_in_map_location_3_should_return_Zoro(){
+  Person *personZoro = personNew("Zoro", 20, 75.4);
+  Person *personToFind = personNew("Zoro", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  map->bucket[2] = (void *)-1;
+  map->bucket[3] = personZoro;
+  
+  hash_ExpectAndReturn(personToFind, 2);
+  
+  result = mapLinearFind(map, personToFind, comparePerson, hash);
+
+  TEST_ASSERT_EQUAL_PTR(personZoro, result);
+}
+
+void test_mapLinearFind_given_marked_marked_Zoro_Zoro_is_in_map_location_4_should_return_Zoro(){
+  Person *personZoro = personNew("Zoro", 20, 75.4);
+  Person *personToFind = personNew("Zoro", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  map->bucket[2] = (void *)-1;
+  map->bucket[3] = (void *)-1;
+  map->bucket[4] = personZoro;
+  
+  hash_ExpectAndReturn(personToFind, 2);
+  
+  result = mapLinearFind(map, personToFind, comparePerson, hash);
+
+  TEST_ASSERT_EQUAL_PTR(personZoro, result);
+}
+
+void test_mapLinearFind_given_marked_Ali_Zoro_Zoro_is_in_map_location_4_should_return_Zoro(){
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personZoro = personNew("Zoro", 20, 75.4);
+  Person *personToFind = personNew("Zoro", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  map->bucket[2] = (void *)-1;
+  map->bucket[3] = personAli;
+  map->bucket[4] = personZoro;
+  
+  hash_ExpectAndReturn(personToFind, 2);
+  
+  result = mapLinearFind(map, personToFind, comparePerson, hash);
+
+  TEST_ASSERT_EQUAL_PTR(personZoro, result);
+}
+
+void test_mapLinearFind_given_Zoro_is_in_map_location_4_but_hash_is_out_of_bounds_should_throw_error(){
+  CEXCEPTION_T e;
+  Person *personZoro = personNew("Zoro", 20, 75.4);
+  Person *personToFind = personNew("Zoro", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  
+  map->bucket[4] = personZoro;
+  
+  hash_ExpectAndReturn(personToFind, 5);
+  
+  Try{
+    result = mapLinearFind(map, personToFind, comparePerson, hash);
+    TEST_FAIL_MESSAGE("Expect ERR_OUT_OF_BOUNDS exception to be thrown");
+  }Catch(e){
+    TEST_ASSERT_EQUAL(ERR_OUT_OF_BOUNDS, e);
+  }
+}
+
+void test_mapLinearRemove_given_Ali_but_Ali_is_not_in_map_should_return_NULL(){
+  Person *personToRemove = personNew("Ali", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  
+  hash_ExpectAndReturn(personToRemove, 3);
+  
+  result = mapLinearRemove(map, personToRemove, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(NULL, result);
+}
+
+void test_mapLinearRemove_given_marked_NULL_finding_Ali_but_Ali_is_not_in_map_should_return_NULL(){
+  Person *personToRemove = personNew("Ali", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  map->bucket[2] = (void *)-1;
+  map->bucket[3] = NULL;
+  
+  hash_ExpectAndReturn(personToRemove, 2);
+  
+  result = mapLinearRemove(map, personToRemove, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(NULL, result);
+}
+
+void test_mapLinearRemove_given_Ali_Ali_is_in_map_location_3_should_return_Ali_and_mark_loc_3(){
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personToRemove = personNew("Ali", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  map->bucket[3] = personAli;
+  
+  hash_ExpectAndReturn(personToRemove, 3);
+  
+  result = mapLinearRemove(map, personToRemove, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(personAli, result);
+  TEST_ASSERT_EQUAL_PTR(-1, map->bucket[3]);
+}
+
+void test_mapLinearRemove_given_Zoro_Ali_Ali_is_in_map_location_3_should_return_Ali_and_mark_loc_3(){
+  Person *personZoro = personNew("Zoro", 20, 75.4);
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personToRemove = personNew("Ali", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  map->bucket[2] = personZoro;
+  map->bucket[3] = personAli;
+  
+  hash_ExpectAndReturn(personToRemove, 2);
+  
+  result = mapLinearRemove(map, personToRemove, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(personAli, result);
+  TEST_ASSERT_EQUAL_PTR(-1, map->bucket[3]);
+}
+
+void test_mapLinearRemove_given_Zoro_Ana_Ali_Ali_is_in_map_location_3_should_return_Ali_and_mark_loc_3(){
+  Person *personZoro = personNew("Zoro", 20, 75.4);
+  Person *personAna = personNew("Ana", 19, 44.6);
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personToRemove = personNew("Ali", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  map->bucket[2] = personZoro;
+  map->bucket[3] = personAli;
+  map->bucket[4] = personAna;
+  
+  hash_ExpectAndReturn(personToRemove, 2);
+  
+  result = mapLinearRemove(map, personToRemove, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(personAli, result);
+  TEST_ASSERT_EQUAL_PTR(-1, map->bucket[3]);
+  TEST_ASSERT_EQUAL_PTR(personZoro, map->bucket[2]);
+  TEST_ASSERT_EQUAL_PTR(personAna, map->bucket[4]);
+}
+
+void test_mapLinearRemove_given_marked_Ali_Ali_is_in_map_location_3_should_return_Ali_and_mark_loc_3(){
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personToRemove = personNew("Ali", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  map->bucket[2] = (void *)-1;
+  map->bucket[3] = personAli;
+  
+  hash_ExpectAndReturn(personToRemove, 2);
+  
+  result = mapLinearRemove(map, personToRemove, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(personAli, result);
+  TEST_ASSERT_EQUAL_PTR(-1, map->bucket[3]);
+}
+
+void test_mapLinearRemove_given_Ana_marked_Ali_Ali_is_in_map_location_3_should_return_Ali_and_mark_loc_3(){
+  Person *personAna = personNew("Ana", 19, 44.6);
+  Person *personAli = personNew("Ali", 25, 70.3);
+  Person *personToRemove = personNew("Ali", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  map->bucket[2] = personAna;
+  map->bucket[3] = (void *)-1;
+  map->bucket[4] = personAli;
+  
+  hash_ExpectAndReturn(personToRemove, 2);
+  
+  result = mapLinearRemove(map, personToRemove, comparePerson, hash);
+  
+  TEST_ASSERT_EQUAL_PTR(personAli, result);
+  TEST_ASSERT_EQUAL_PTR(-1, map->bucket[4]);
+  TEST_ASSERT_EQUAL_PTR(-1, map->bucket[3]);
+}
+
+void test_mapLinearRemove_given_Ali_is_in_map_location_4_but_hash_is_out_of_bounds_should_throw_error(){
+  CEXCEPTION_T e;
+  Person *personAli = personNew("Ali", 20, 75.4);
+  Person *personToRemove = personNew("James", 0, 0);
+  Person *result;
+  Map *map = mapNew(5);
+  
+  map->bucket[4] = personAli;
+  
+  hash_ExpectAndReturn(personToRemove, 5);
+  
+  Try{
+    result = mapLinearRemove(map, personToRemove, comparePerson, hash);
+    TEST_FAIL_MESSAGE("Expect ERR_OUT_OF_BOUNDS exception to be thrown");
+  }Catch(e){
+    TEST_ASSERT_EQUAL(ERR_OUT_OF_BOUNDS, e);
   }
 }
